@@ -369,4 +369,28 @@ mod tests {
         let claimed = fx.store.claimed_keys().unwrap();
         assert!(!claimed.contains("claude-code:sdk-1"), "{claimed:?}");
     }
+
+    #[test]
+    fn dropping_watcher_joins_worker_and_releases_its_state() {
+        let fx = Fixture::new();
+        let adapters = Arc::new(fx.adapters);
+        let watcher = start_watcher(adapters.clone(), fx.store.clone(), Arc::new(NullEvents))
+            .expect("fixture must create a watcher");
+        assert_eq!(
+            watcher.watched_roots(),
+            &std::collections::BTreeSet::from([fx.root])
+        );
+
+        // 在另一条线程 drop,让真正的死锁变成有界失败,而不是永远到不了耗时断言。
+        let (tx, rx) = mpsc::channel();
+        let dropper = std::thread::spawn(move || {
+            drop(watcher);
+            tx.send(()).unwrap();
+        });
+        rx.recv_timeout(Duration::from_secs(5))
+            .expect("watcher drop must stop and join its worker");
+        dropper.join().unwrap();
+        assert_eq!(Arc::strong_count(&adapters), 1);
+        assert_eq!(Arc::strong_count(&fx.store), 1);
+    }
 }
