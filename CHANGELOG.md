@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## [0.8.5] — 2026-09-27
 
+- Fix: Devin CLI sessions stored under `%APPDATA%\devin` are now discovered automatically on Windows (#53, thanks @yougeqiu).
 - Fix: Closing the main window on Linux requests application shutdown, with a timeout fallback if shutdown stalls. Settings windows close independently, and pending window geometry is saved before quitting (#54, thanks @bet4it).
 
 ## [0.8.4] — 2026-09-25
