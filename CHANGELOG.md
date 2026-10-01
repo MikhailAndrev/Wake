@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.8.6] — 2026-10-01
 
 - Fix: Remote sync on Windows now accepts local cache paths with drive letters, avoiding the "source and destination cannot both be remote" error before any files transfer (#56, thanks @zhyg).
 
